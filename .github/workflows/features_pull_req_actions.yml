@@ -1,0 +1,51 @@
+name: Run tests when merge to main
+
+on:
+  pull_request:
+    branches: [ features ]
+    types: [opened, synchronize, reopened]
+
+jobs:
+  run-tests:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '10.x'
+        
+    - name: Restore dependencies
+      run: dotnet restore
+      
+    - name: Build
+      run: dotnet build --configuration Debug --no-restore
+      
+    - name: Run Unit Tests
+      run: |
+        find . -name "*.UnitTests.csproj" -type f | while read project; do
+          echo "Running tests for: $project"
+          dotnet test "$project" --configuration Debug --no-build \
+            --logger "trx;LogFileName=$(basename "$project" .csproj).trx" \
+            --results-directory TestResults
+        done
+        
+    - name: Run Integrated Tests
+      run: |
+        find . -name "*.Tests.csproj" -type f | while read project; do
+          echo "Running integrated tests for: $project"
+          dotnet test "$project" --configuration Debug --no-build \
+            --filter "TestCategory=Integrated" \
+            --logger "trx;LogFileName=$(basename "$project" .csproj)-integrated.trx" \
+            --results-directory TestResults
+        done
+        
+    - name: Upload Test Results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-results
+        path: TestResults/
+        retention-days: 30
