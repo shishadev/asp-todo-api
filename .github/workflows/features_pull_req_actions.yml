@@ -1,4 +1,4 @@
-name: Run tests when merge to main
+name: Run tests when merge to features
 
 on:
   workflow_dispatch:
@@ -34,7 +34,7 @@ jobs:
           dotnet test "$project" --configuration Debug --no-build \
             --logger "trx;LogFileName=$(basename "$project" .csproj).trx" \
             --results-directory TestResults \
-            --parallel
+            --verbosity normal
         done
         
     - name: Run Integrated Tests
@@ -45,7 +45,7 @@ jobs:
             --filter "TestCategory=Integrated" \
             --logger "trx;LogFileName=$(basename "$project" .csproj)-integrated.trx" \
             --results-directory TestResults \
-            --parallel
+            --verbosity normal
         done
         
     - name: Upload Test Results
