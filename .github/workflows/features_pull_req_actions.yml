@@ -1,9 +1,13 @@
 name: Run tests when merge to main
 
 on:
+  workflow_dispatch:
   pull_request:
     branches: [ features ]
     types: [opened, synchronize, reopened]
+
+  push:
+    branches: [ features ]
 
 jobs:
   run-tests:
