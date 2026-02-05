@@ -3,11 +3,11 @@ name: Run tests when merge to main
 on:
   workflow_dispatch:
   pull_request:
-    branches: [ features ]
+    branches: [ main ]
     types: [opened, synchronize, reopened]
 
   push:
-    branches: [ features ]
+    branches: [ main ]
 
 jobs:
   run-tests:
@@ -34,7 +34,7 @@ jobs:
           dotnet test "$project" --configuration Debug --no-build \
             --logger "trx;LogFileName=$(basename "$project" .csproj).trx" \
             --results-directory TestResults \
-            --parallel
+            --verbosity normal
         done
         
     - name: Run Integrated Tests
@@ -42,10 +42,9 @@ jobs:
         find . -name "*.Tests.csproj" -type f | while read project; do
           echo "Running integrated tests for: $project"
           dotnet test "$project" --configuration Debug --no-build \
-            --filter "TestCategory=Integrated" \
             --logger "trx;LogFileName=$(basename "$project" .csproj)-integrated.trx" \
             --results-directory TestResults \
-            --parallel
+            --verbosity normal
         done
         
     - name: Upload Test Results
