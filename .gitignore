@@ -1,0 +1,8 @@
+/.vs
+/.idea
+appsettings.*.json
+!appsettings.json
+/src/API/API.http
+**/*.csproj.user
+/src/*/bin
+/src/*/obj

@@ -1,0 +1,8 @@
+[*.cs]
+
+dotnet_diagnostic.IDE0290.severity = none
+dotnet_diagnostic.CA1852.severity = warning  # internal sealed
+dotnet_diagnostic.CA1724.severity = suggestion
+dotnet_diagnostic.CA2007.severity = none  # ConfigureAwait
+dotnet_diagnostic.IDE0037.severity = none
+dotnet_diagnostic.CA1515.severity = none
