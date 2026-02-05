@@ -29,7 +29,8 @@ jobs:
           echo "Running tests for: $project"
           dotnet test "$project" --configuration Debug --no-build \
             --logger "trx;LogFileName=$(basename "$project" .csproj).trx" \
-            --results-directory TestResults
+            --results-directory TestResults \
+            --parallel
         done
         
     - name: Run Integrated Tests
@@ -39,7 +40,8 @@ jobs:
           dotnet test "$project" --configuration Debug --no-build \
             --filter "TestCategory=Integrated" \
             --logger "trx;LogFileName=$(basename "$project" .csproj)-integrated.trx" \
-            --results-directory TestResults
+            --results-directory TestResults \
+            --parallel
         done
         
     - name: Upload Test Results
