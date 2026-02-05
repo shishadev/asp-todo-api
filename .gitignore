@@ -1,8 +1,13 @@
 /.vs
 /.idea
-appsettings.*.json
-!appsettings.json
-/src/API/API.http
-**/*.csproj.user
 /src/*/bin
 /src/*/obj
+/tests/*/bin
+/tests/*/obj
+
+appsettings.*.json
+!appsettings.json
+
+/src/API/API.http
+**/*.csproj.user
+**/*.sln.DotSettings.user
