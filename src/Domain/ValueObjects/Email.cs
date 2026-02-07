@@ -20,12 +20,14 @@ public sealed partial record Email
             return new EmailValidationException(email, "Email cannot be empty");
         }
 
-        if (!EmailFormatRegex().IsMatch(email))
+        var trimmedEmail = email.Trim();
+        
+        if (!EmailFormatRegex().IsMatch(trimmedEmail))
         {
             return EmailValidationException.InvalidFormat(email);
         }
 
-        return new Email(email);
+        return new Email(trimmedEmail);
     }
 
     [GeneratedRegex(@"^[^@\s]+@[^@\s]+\.[^@\s]+$")]
