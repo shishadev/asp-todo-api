@@ -39,7 +39,7 @@ jobs:
         
     - name: Run Integrated Tests
       run: |
-        find . -name "*.Tests.csproj" -type f | while read project; do
+        find . -name "*.IntegratedTests.csproj" -type f | while read project; do
           echo "Running integrated tests for: $project"
           dotnet test "$project" --configuration Debug --no-build \
             --filter "TestCategory=Integrated" \
