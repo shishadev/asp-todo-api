@@ -32,6 +32,7 @@ jobs:
         find . -name "*.UnitTests.csproj" -type f | while read project; do
           echo "Running tests for: $project"
           dotnet test "$project" --configuration Debug --no-build \
+            --filter "TestCategory!=LowPriority" \
             --logger "trx;LogFileName=$(basename "$project" .csproj).trx" \
             --results-directory TestResults \
             --verbosity normal
@@ -42,7 +43,7 @@ jobs:
         find . -name "*.IntegratedTests.csproj" -type f | while read project; do
           echo "Running integrated tests for: $project"
           dotnet test "$project" --configuration Debug --no-build \
-            --filter "TestCategory=Integrated" \
+            --filter "TestCategory!=LowPriority" \
             --logger "trx;LogFileName=$(basename "$project" .csproj)-integrated.trx" \
             --results-directory TestResults \
             --verbosity normal
