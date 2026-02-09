@@ -22,7 +22,7 @@ public sealed class AuthController : ControllerBase
 
     [Authorize]
     [HttpPost("token")]
-    [ProducesResponseType(typeof(CreateTokenResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(CreateTokenResponse), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<CreateTokenResponse>> CreateAccessToken([FromBody] CreateAccessTokenRequest request)
@@ -31,12 +31,42 @@ public sealed class AuthController : ControllerBase
         
         if (claims.FirstOrDefault(claim => claim.Type == "clientId")?.Value != "client-app")
         {
+            _logger.LogDebug("Request with not valid claim type");
+            
             return Unauthorized();
         }
         
-        var token = await Task.Run(() => _tokenGenerator.Generate(request.UserId, request.Email));
+        var authorizationHeader = HttpContext.Request.Headers.Authorization.ToString();
+    
+        if (string.IsNullOrWhiteSpace(authorizationHeader))
+        {
+            _logger.LogDebug("Cannot get authorization header");
+            
+            return Unauthorized();
+        }
+        
+        ReadOnlySpan<char> bearerPrefix = "Bearer ";
+        
+        var registrationTokenSpan = authorizationHeader.StartsWith(bearerPrefix, StringComparison.OrdinalIgnoreCase)
+            ? authorizationHeader.AsSpan(bearerPrefix.Length)
+            : authorizationHeader.AsSpan();
 
-        var response = new CreateTokenResponse(token);
+        var registrationTokenResult = await _cacheService.Get(registrationTokenSpan.Trim());
+
+        if (registrationTokenResult.IsSuccess)
+        {
+            await _cacheService.Remove(registrationTokenResult.Value);
+        }
+        else
+        {
+            _logger.LogDebug("Token not registered");
+            
+            return Unauthorized();
+        }
+        
+        var accessToken = await Task.Run(() => _tokenGenerator.Generate(request.UserId, request.Email));
+
+        var response = new CreateTokenResponse(accessToken);
 
         _logger.LogInformation("Created token for email: {email}", request.Email);
 
@@ -44,12 +74,14 @@ public sealed class AuthController : ControllerBase
     }
     
     [HttpPost("registration-token")]
-    [ProducesResponseType(typeof(CreateTokenResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(CreateTokenResponse), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<CreateTokenResponse>> CreateRegistrationToken([FromBody] CreateRegistrationTokenRequest request)
     {
         var token = await Task.Run(() => _tokenGenerator.GenerateRegistrationToken(request.ClientId, request.ClientName));
+        
+        await _cacheService.Set(token, TimeSpan.FromMinutes(1));
 
         var response = new CreateTokenResponse(token);
 

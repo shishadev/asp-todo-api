@@ -23,7 +23,7 @@ builder.Services.AddAuthorization();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(x =>
     {
-        var keyByteArray = Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Secret"]);
+        var keyByteArray = Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Secret"]!);
 
         x.TokenValidationParameters = new TokenValidationParameters
         {

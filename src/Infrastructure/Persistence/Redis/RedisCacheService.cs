@@ -10,7 +10,22 @@ public sealed class RedisCacheService : ICacheService
         throw new NotImplementedException();
     }
 
+    public Task<Option<string>> Get(ReadOnlySpan<char> key)
+    {
+        throw new NotImplementedException();
+    }
+
     public Task Set(string key, string value, TimeSpan expiration)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task Set(string value, TimeSpan expiration)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task Remove(string key)
     {
         throw new NotImplementedException();
     }
