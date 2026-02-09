@@ -1,4 +1,5 @@
 using Domain.Services;
+using Infrastructure.Persistence.InMemory;
 using Infrastructure.Persistence.Redis;
 using Infrastructure.Services;
 using Microsoft.Extensions.Configuration;
@@ -18,7 +19,9 @@ public static class DependencyInjection
         //services.AddScoped<IPasswordHasher, PasswordHasher>();
 
         services.AddScoped<ITokenGenerator, TokenGenerator>();
-        services.AddScoped<ICacheService, RedisCacheService>();
+        services.AddMemoryCache();
+        services.AddScoped<ICacheService, MemoryCacheService>();
+        //services.AddScoped<ICacheService, RedisCacheService>();
         
         return services;
     }
